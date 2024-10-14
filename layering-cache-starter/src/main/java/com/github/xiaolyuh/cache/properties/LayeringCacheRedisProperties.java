@@ -11,7 +11,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author wangyuhao
  */
 @Data
-@ConfigurationProperties(prefix = "layering-cache.redis")
+@ConfigurationProperties(prefix = "spring.redis")
 public class LayeringCacheRedisProperties {
     //********************单机配置项**************************/
     /**

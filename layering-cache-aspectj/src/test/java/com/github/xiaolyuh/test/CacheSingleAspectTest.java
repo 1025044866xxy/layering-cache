@@ -466,10 +466,11 @@ public class CacheSingleAspectTest {
 
     @Test
     public void testEvictUser() {
+        testService.evictUserx(Arrays.asList(1L,2L,3L,4L));
         long userId = 118;
         User user = testService.putUser(userId);
         sleep(3);
-        testService.evictUser(userId);
+
         sleep(3);
         Object result = redisClient.get("user:info:118:118", User.class);
         Assert.assertNull(result);

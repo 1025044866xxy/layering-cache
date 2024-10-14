@@ -12,13 +12,8 @@ import com.github.xiaolyuh.util.RandomUtils;
 import com.github.xiaolyuh.util.ThreadTaskUtils;
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.Value;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -382,7 +377,6 @@ public class RedisCache extends AbstractValueAdaptingCache {
         }
         String[] keys = cacheKeys.stream().map(cacheKey -> (String) cacheKey.getKeyElement()).toArray(String[]::new);
         List<Object> loadValues = (List<Object>) valueLoader.apply(keys);
-
         if (logger.isDebugEnabled()) {
             logger.debug("redis缓存 cacheName={}  cacheKeys={} 从库加载缓存 {}", getName(), JSON.toJSONString(cacheKeys), JSON.toJSONString(loadValues));
         }

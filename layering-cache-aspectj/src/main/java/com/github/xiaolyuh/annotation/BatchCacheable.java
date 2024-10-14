@@ -53,6 +53,14 @@ public @interface BatchCacheable {
     String keys();
 
     /**
+     * 缓存keys，需要是SpEL表达式。这个表达式会用于从参数和返回值中获取缓存keys
+     * 该表达式需要返回一个List对象
+     *
+     * @return String
+     */
+    String returnKeys() default "";
+
+    /**
      * 生成缓存的条件，默认空全部缓存。支持SpEL表达式
      *
      * @return

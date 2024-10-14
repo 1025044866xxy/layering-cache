@@ -22,12 +22,7 @@ import com.github.xiaolyuh.util.ToStringUtils;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -230,7 +225,7 @@ public class LayeringAspect {
         Object key = generateKey(cacheable.key(), method, args, target);
         Assert.notNull(key, String.format(CACHE_KEY_ERROR_MESSAGE, cacheable.key()));
 
-        // 从注解中获取缓存配置
+        // 从注解中获取缓存配置                                                                        nnnnnn
         FirstCache firstCache = cacheable.firstCache();
         SecondaryCache secondaryCache = cacheable.secondaryCache();
         FirstCacheSetting firstCacheSetting = new FirstCacheSetting(firstCache.initialCapacity(), firstCache.maximumSize(),
@@ -382,6 +377,10 @@ public class LayeringAspect {
      */
     private void delete(String[] cacheNames, String keySpEL, Method method, Object[] args, Object target) {
         Object key = generateKey(keySpEL, method, args, target);
+        boolean isArray = false;
+        if(key instanceof List){
+            isArray = true;
+        }
         Assert.notNull(key, String.format(CACHE_KEY_ERROR_MESSAGE, keySpEL));
         for (String cacheName : cacheNames) {
             Collection<Cache> caches = cacheManager.getCache(cacheName);
@@ -389,10 +388,19 @@ public class LayeringAspect {
                 // 如果没有找到Cache就新建一个默认的
                 Cache cache = cacheManager.getCache(cacheName,
                         new LayeringCacheSetting(new FirstCacheSetting(), new SecondaryCacheSetting(), "默认缓存配置（删除时生成）", CacheMode.ALL));
-                cache.evict(ToStringUtils.toString(key));
+                if (isArray) {
+                    cache.evictAll(((List<?>) key).stream().map(Object::toString).collect(Collectors.toList()));
+                } else {
+                    cache.evict(ToStringUtils.toString(key));
+                }
+                ;
             } else {
                 for (Cache cache : caches) {
-                    cache.evict(ToStringUtils.toString(key));
+                    if (isArray) {
+                        cache.evictAll(((List<?>) key).stream().map(Object::toString).collect(Collectors.toList()));
+                    } else {
+                        cache.evict(ToStringUtils.toString(key));
+                    }
                 }
             }
         }
@@ -498,7 +506,7 @@ public class LayeringAspect {
                     }
                 }
                 Object ret = joinPoint.proceed(args);
-                String returnKeyEL = cacheable.keys();
+                String returnKeyEL = cacheable.returnKeys();
                 // 将值按Key顺序返回
                 if (ret instanceof List) {
                     List<?> retList = (List<?>) ret;
@@ -508,8 +516,7 @@ public class LayeringAspect {
                     StandardEvaluationContext context = new StandardEvaluationContext();
 
                     // 为了复用从入参取keys的EL表达式，retList放入context时需要取出EL表达式中的变量名（#(name).![id]）
-                    String name = returnKeyEL.substring(1, !returnKeyEL.contains(".") ? returnKeyEL.length() : returnKeyEL.indexOf("."));
-                    context.setVariable(name, retList);
+                    context.setVariable("result", retList);
 
                     AnnotatedElementKey methodCacheKey = new AnnotatedElementKey(method, targetClass);
                     List<String> returnKeys = ((List<Object>) evaluator.keys(returnKeyEL, methodCacheKey, context))

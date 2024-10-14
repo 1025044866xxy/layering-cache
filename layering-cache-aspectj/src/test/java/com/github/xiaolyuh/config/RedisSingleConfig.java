@@ -22,10 +22,10 @@ public class RedisSingleConfig {
     @Value("${spring.redis.database:0}")
     private int database;
 
-    @Value("${spring.redis.host:127.0.0.1}")
+    @Value("${spring.redis.host:10.10.0.11}")
     private String host;
 
-    @Value("${spring.redis.password:}")
+    @Value("${spring.redis.password:HFVlCMgdblAmBiO}")
     private String password;
 
     @Value("${spring.redis.port:6379}")

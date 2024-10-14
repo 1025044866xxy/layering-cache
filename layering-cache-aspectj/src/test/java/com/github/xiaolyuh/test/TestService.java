@@ -357,6 +357,11 @@ public class TestService {
 
     }
 
+    @CacheEvict(value = "user:info:x", key = "#userId")
+    public void evictUserx(List<Long> userId) {
+
+    }
+
     @CacheEvict(value = "user:info")
     public void evictUserNoKey(long userId, String[] lastName, User user) {
 

@@ -20,9 +20,10 @@ import org.slf4j.LoggerFactory;
 public class BatchTestService {
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    @BatchCacheable(value = "user:info", keys = "#users.![userId]", depict = "用户信息缓存",
-            firstCache = @FirstCache(expireTime = 10, timeUnit = TimeUnit.SECONDS),
-            secondaryCache = @SecondaryCache(expireTime = 10, preloadTime = 3, timeUnit = TimeUnit.SECONDS))
+    @BatchCacheable(value = "user:info:x", keys = "#users.![userId]", depict = "用户信息缓存"
+            ,returnKeys = "#result.![userId]",
+            firstCache = @FirstCache(expireTime = 1000, timeUnit = TimeUnit.SECONDS),
+            secondaryCache = @SecondaryCache(expireTime = 1000, preloadTime = 3, timeUnit = TimeUnit.SECONDS))
     public List<User> getUserByIds(List<User> users) {
         logger.debug("测试正常配置的批量缓存方法");
 
@@ -37,7 +38,8 @@ public class BatchTestService {
         return res;
     }
 
-    @BatchCacheable(value = "user:info", keys = "#users.![userId]", depict = "用户信息缓存",
+    @BatchCacheable(value = "user:info:a", keys = "#users.![userId]", depict = "用户信息缓存",
+            returnKeys = "#result.![userId]",
             firstCache = @FirstCache(expireTime = 10, timeUnit = TimeUnit.SECONDS),
             secondaryCache = @SecondaryCache(expireTime = 10, preloadTime = 3, timeUnit = TimeUnit.SECONDS))
     public List<User> getUserByIdsReturnNone(List<User> users) {
